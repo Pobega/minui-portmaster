@@ -355,24 +355,14 @@ main() {
         export PLATFORM="tg5040"
     fi
 
-    if ! command -v minui-presenter >/dev/null 2>&1; then
-        show_message "Minui-presenter not found." 3
-        exit 1
-    fi
-
-    if ! command -v minui-power-control >/dev/null 2>&1; then
-        show_message "Minui-power-control not found." 3
-        exit 1
-    fi
-
-    if ! command -v jq >/dev/null 2>&1; then
-        show_message "Jq not found." 3
-        exit 1
-    fi
-
-    chmod +x "$PAK_DIR/bin/minui-presenter"
-    chmod +x "$PAK_DIR/bin/minui-power-control"
-    chmod +x "$PAK_DIR/bin/jq"
+    required_tools="minui-presenter minui-power-control jq"
+    for tool in $required_tools; do
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            show_message "$tool not found." 3
+            exit 1
+        fi
+        chmod +x "$PAK_DIR/bin/$tool"
+    done
     chmod +x "$PAK_DIR/bin/bash"
 
     allowed_platforms="tg5040"
