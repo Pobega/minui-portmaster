@@ -348,6 +348,11 @@ set_controller_layout() {
 }
 
 main() {
+    # CPU frequency targets while a port runs. Values are in kHz (sysfs
+    # convention); tg5040 tops out at 1.8 GHz.
+    CPU_MIN_FREQ_KHZ=1608000
+    CPU_MAX_FREQ_KHZ=1800000
+
     echo "1" >/tmp/stay_awake
     trap "cleanup" EXIT INT TERM HUP QUIT
 
@@ -388,8 +393,8 @@ main() {
     cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq \
         >"$USERDATA_PATH/PORTS-portmaster/cpu_max_freq.txt"
     echo ondemand >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-    echo 1608000 >/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-    echo 1800000 >/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+    echo "$CPU_MIN_FREQ_KHZ" >/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+    echo "$CPU_MAX_FREQ_KHZ" >/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 
     echo "Starting PortMaster with ROM: $ROM_PATH"
     show_message "Starting, please wait..." forever
