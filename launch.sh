@@ -396,8 +396,10 @@ main() {
 
     if [ -f "$PAK_DIR/files/bin.tar.gz" ] || [ -f "$PAK_DIR/files/lib.tar.gz" ]; then
         show_message "Unpacking files, please wait..." forever
-        unpack_tar "$PAK_DIR/files/bin.tar.gz" "$PAK_DIR/bin"
-        unpack_tar "$PAK_DIR/files/lib.tar.gz" "$PAK_DIR/lib"
+        unpack_tar "$PAK_DIR/files/bin.tar.gz" "$PAK_DIR/bin" \
+            || { show_message "Unpack failed" 3; exit 1; }
+        unpack_tar "$PAK_DIR/files/lib.tar.gz" "$PAK_DIR/lib" \
+            || { show_message "Unpack failed" 3; exit 1; }
     fi
 
     if [ ! -f "$PAK_DIR/bin/busybox_wrappers.processed" ]; then
