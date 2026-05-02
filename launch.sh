@@ -37,25 +37,22 @@ export HM_PORTS_DIR="$TEMP_DATA_DIR/ports"
 export HM_SCRIPTS_DIR="$TEMP_DATA_DIR/ports"
 
 # shellcheck disable=SC2317
+restore_cpu_setting() {
+    saved="$USERDATA_PATH/PORTS-portmaster/$1.txt"
+    sysfs="/sys/devices/system/cpu/cpu0/cpufreq/$2"
+    [ -f "$saved" ] || return
+    cat "$saved" >"$sysfs"
+    rm -f "$saved"
+}
+
+# shellcheck disable=SC2317
 cleanup() {
     rm -f /tmp/power_control_dummy_pid
     killall minui-presenter >/dev/null 2>&1 || true
 
-    if [ -f "$USERDATA_PATH/PORTS-portmaster/cpu_governor.txt" ]; then
-        cat "$USERDATA_PATH/PORTS-portmaster/cpu_governor.txt" \
-            >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-        rm -f "$USERDATA_PATH/PORTS-portmaster/cpu_governor.txt"
-    fi
-    if [ -f "$USERDATA_PATH/PORTS-portmaster/cpu_min_freq.txt" ]; then
-        cat "$USERDATA_PATH/PORTS-portmaster/cpu_min_freq.txt" \
-            >/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-        rm -f "$USERDATA_PATH/PORTS-portmaster/cpu_min_freq.txt"
-    fi
-    if [ -f "$USERDATA_PATH/PORTS-portmaster/cpu_max_freq.txt" ]; then
-        cat "$USERDATA_PATH/PORTS-portmaster/cpu_max_freq.txt" \
-            >/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-        rm -f "$USERDATA_PATH/PORTS-portmaster/cpu_max_freq.txt"
-    fi
+    restore_cpu_setting cpu_governor scaling_governor
+    restore_cpu_setting cpu_min_freq scaling_min_freq
+    restore_cpu_setting cpu_max_freq scaling_max_freq
 
     lsof +f -- "$TEMP_DATA_DIR/ports" | awk 'NR>1 {print $2}' | xargs -r kill -9 2>/dev/null || true
     if umount "$TEMP_DATA_DIR/ports"; then
