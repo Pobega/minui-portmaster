@@ -1,5 +1,6 @@
 #!/bin/sh
-PAK_DIR="$(dirname "$0")"
+cd "$(dirname "$0")" || exit 1
+PAK_DIR="$(pwd)"
 PAK_NAME="$(basename "$PAK_DIR")"
 PAK_NAME="${PAK_NAME%.*}"
 [ -f "$USERDATA_PATH/PORTS-portmaster/debug" ] && set -x
@@ -9,12 +10,11 @@ exec >>"$LOGS_PATH/$PAK_NAME.txt"
 exec 2>&1
 
 echo "$0" "$*"
-cd "$PAK_DIR" || exit 1
 mkdir -p "$USERDATA_PATH/PORTS-portmaster"
 mkdir -p "$SHARED_USERDATA_PATH/PORTS-portmaster"
 
-export PAK_DIR="$SDCARD_PATH/Emus/$PLATFORM/PORTS.pak"
-export EMU_DIR="$SDCARD_PATH/Emus/$PLATFORM/PORTS.pak/PortMaster"
+export PAK_DIR
+export EMU_DIR="$PAK_DIR/PortMaster"
 
 export PATH="$EMU_DIR:$PAK_DIR/bin:$PATH"
 export LD_LIBRARY_PATH="$PAK_DIR/lib:/usr/trimui/lib:$LD_LIBRARY_PATH"
